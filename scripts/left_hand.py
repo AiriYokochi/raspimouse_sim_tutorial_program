@@ -79,6 +79,7 @@ class LeftHand():
         if self.data.left_forward < 300 or self.data.right_forward < 300:
             print("Move: STRAIGHT")
             for time in range(12):
+                print("time:", time)
                 self.checker()
                 if self.data.left_side > self.data.right_side:
                     self.moveFeedback(500, 500, 0.2, "LEFT")
@@ -92,6 +93,7 @@ class LeftHand():
                 if self.rs_count > 0:
                     print("Move: MID LEFT TURN")
                     for time in range(10):
+                        print("time:", time)
                         self.turn_move("LEFT")
                         self.rate.sleep()
                     self.stopMove()
@@ -101,6 +103,7 @@ class LeftHand():
                 if self.ls_count > 0 and self.rs_count > 0:
                     print("Move: LEFT TURN_2")
                     for time in range(10):
+                        print("time:", time)
                         self.turn_move("LEFT")
                         self.rate.sleep()
                     self.stopMove()
@@ -108,6 +111,7 @@ class LeftHand():
                 elif self.ls_count > 0:
                     print("Move: RIGHT TURN")
                     for time in range(10):
+                        print("time:", time)
                         self.turn_move("RIGHT")
                         self.rate.sleep()
                     self.stopMove()
@@ -115,6 +119,7 @@ class LeftHand():
                 elif self.rs_count > 0:
                     print("Move: LEFT TURN")
                     for time in range(10):
+                        print("time:", time)
                         self.turn_move("LEFT")
                         self.rate.sleep()
                     self.stopMove()          
@@ -138,24 +143,38 @@ class LeftHand():
             self.moveFeedback(500, 500, 0.2, "RIGHT")
 
     def init(self):
+        print("init:1")
         if self.modeSimReset:
+            print("init:2")
             rospy.wait_for_service('/gazebo/reset_world')
+            print("init:3")
             try: rospy.ServiceProxy('/gazebo/reset_world', Empty).call()
             except rospy.ServiceException, e: print "Service call failed: %s"%e
+        print("init:4")
         rospy.wait_for_service('/motor_on')
+        print("init:5")
         try: rospy.ServiceProxy('/motor_on', Trigger).call()
         except rospy.ServiceException, e: print "Service call failed: %s"%e
         
     def run(self):
+        print("1")
         self.rate = rospy.Rate(10)
+        print("2")
         self.init()
+        print("3")
         rospy.on_shutdown(self.stopMove)
+        print("4")
         while self.data.left_side == 0 and self.data.right_side == 0:
+            print("5")
             self.rate.sleep()
         while not rospy.is_shutdown():
+            print("6")
             self.motion()
             self.rate.sleep()
 
 if __name__ == '__main__':
+    print("start:")
     rospy.init_node('LeftHand')
+    print("init:done")
     LeftHand().run()
+    print("run")
